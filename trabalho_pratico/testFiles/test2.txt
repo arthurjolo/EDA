@@ -1,0 +1,2 @@
+testFiles/minTerms/minTerms2.txt
+testFiles/dontCares/dontCares2.txt

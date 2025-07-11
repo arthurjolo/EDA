@@ -1,0 +1,1 @@
+testFiles/minTerms/minTerms3.txt
