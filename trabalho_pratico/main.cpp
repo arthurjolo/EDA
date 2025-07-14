@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <chrono>
 
 #include "QuineMcCluskey.hh"
 #include "aig.hh"
@@ -29,6 +30,9 @@ int readFiles(int& nInputs, std::vector<std::string>& minTerms, std::vector<std:
             } else if(nInputs != linha.size()) {
                 std::cerr << "Error: min terms don't have the same number of inputs!." << std::endl;
                 return 1;
+            }
+            if(std::find(minTerms.begin(), minTerms.end(), linha) != minTerms.end()) {
+                continue;
             }
             minTerms.push_back(linha);
         }
@@ -87,6 +91,7 @@ int main() {
         return 1;
     }
 
+    /*
     std::cout << "\nInput logic: ";
     bool first = true;
     for(const std::string& binario : minTerms) {
@@ -96,13 +101,17 @@ int main() {
         } else {
             std::cout << " + " << binario;
         }
-    }
+    }*/
 
     std::cout << "\n\nRuning QuineMcCluskey algorithm ..." << std::endl;
+    auto QuineMcCluskeyStart = std::chrono::high_resolution_clock::now();
     QuineMcCluskey ferramenta = QuineMcCluskey(nInputs, minTerms, dontCares);
     ferramenta.run();
+    auto QuineMcCluskeyEnd = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> QuineMcCluskeyDuration = QuineMcCluskeyEnd - QuineMcCluskeyStart;
+    std::cout << "  Tempo de execução: " << QuineMcCluskeyDuration.count() << " segundos\n";
     std::cout << "  Optimized logic: ";
-    first = true;
+    bool first = true;
     for(const std::string& binario : ferramenta.getRestuls()) {
         if(first) {
             std::cout << binario;
@@ -114,8 +123,12 @@ int main() {
     std::cout << std::endl;
 
     std::cout << "\nBuilding AIG ..." << std::endl;
+    auto AigStart = std::chrono::high_resolution_clock::now();
     AndInverterGraph aig = AndInverterGraph(nInputs, ferramenta.getRestuls());
     aig.run();
+    auto AigEnd = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> AigDuration = AigEnd - AigStart;
+    std::cout << "  Tempo de execução: " << AigDuration.count() << " segundos\n";
 
     std::vector<std::string> testsRestuls = aig.getActivatedTerms();
 

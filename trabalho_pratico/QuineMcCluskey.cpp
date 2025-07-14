@@ -180,6 +180,9 @@ void QuineMcCluskey::createTable()
         }
         if(el.second.size() == 1) {
             Implicant implicante = implicantePrimos_[el.second[0]];
+            if(std::find(result_.begin(), result_.end(), implicante.getExpression()) != result_.end()) {
+                continue;
+            }
             result_.push_back(implicante.getExpression());
             for(int minTerm : implicante.getMinTerms()) {
                 minTermContemplados_.insert(minTerm);
@@ -200,7 +203,7 @@ void QuineMcCluskey::createTable()
         }
     }
     while (minTermContemplados_.size() != minTerms_.size()) {
-        Implicant escolhido = bestImplicante();
+        Implicant escolhido = bestImplicante();  // implicante que cobre maior número de novos mintermos
         if(debug_) {
             std::cout << "  Escolhido foi: " << escolhido.getExpression() << " contemplando: " << escolhido.getCoverage() << " minterms" << std::endl;
         }

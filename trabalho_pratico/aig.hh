@@ -24,7 +24,6 @@ class GraphNode
     int id_;
     std::string name_;
     int currValue_;
-    std::vector<int> children_;
 };
 
 
@@ -44,6 +43,7 @@ class AndInverterGraph
     void dfs(int nodeID);
     void setDebug(bool debug) { debug_ = debug; };
     std::vector<std::string> getActivatedTerms() { return activatedTerms_; };
+    void writeOutput();
 
     private:
     int nInputs_;
@@ -54,6 +54,7 @@ class AndInverterGraph
     std::vector<std::string> activatedTerms_;
     std::vector<GraphNode> nodes_;
     std::map<int, std::vector<Edge>> edges_;
+    std::string outputFileName_ = "test_saida.json";
 
 
 };

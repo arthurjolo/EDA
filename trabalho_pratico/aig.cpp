@@ -1,13 +1,16 @@
 #include <iostream>
+#include <fstream>
 #include <bitset>
 
 #include "aig.hh"
+#include "json/json.hpp"
 
 void AndInverterGraph::run()
 {
     buildInputs();
     buildCircuit();
     test();
+    writeOutput();
 }
 
 void AndInverterGraph::buildInputs()
@@ -152,4 +155,42 @@ void AndInverterGraph::dfs(int nodeID)
         std::cout << "  Ficou com: " << nodeCurrValue << std::endl;
     }
     nodes_[nodeID].setCurrValue(nodeCurrValue);
+}
+
+void AndInverterGraph::writeOutput()
+{
+    nlohmann::json outJson;
+    std::vector<nlohmann::json> nodes;
+    std::vector<nlohmann::json> edges;
+    for(auto node : nodes_) {
+        nlohmann::json nodeJson;
+        nodeJson["id"] = node.getId();
+        nodeJson["name"] = node.getName();
+        nodes.push_back(nodeJson);
+    }
+
+    for(auto mapEl : edges_) {
+        for(auto edge : mapEl.second) {
+            nlohmann::json edgeJson;
+            edgeJson["src"] = mapEl.first;
+            edgeJson["dest"] = edge.endPoint;
+            edgeJson["weight"] = edge.wight;
+            edges.push_back(edgeJson);
+        }
+    }
+    outJson["Nodes"] = nodes;
+    outJson["Edges"] = edges;
+
+    // Abre um arquivo de saída
+    std::ofstream arquivo(outputFileName_);
+    if (!arquivo) {
+        std::cerr << "Erro ao abrir o arquivo!" << std::endl;
+        return;
+    }
+
+    // Escreve o JSON no arquivo com indentação
+    arquivo << std::setw(4) << outJson << std::endl;
+
+    // Fecha o arquivo
+    arquivo.close();
 }
